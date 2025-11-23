@@ -1,0 +1,202 @@
+<div class="relative overflow-x-auto">
+  <div class="sub-header flex justify-between py-2">
+    <div class="text-2xl font-semibold">Expense</div>
+    <div class="action">
+      <button
+        type="button"
+        class="text-white bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+        (click)="showDialog()"
+      >
+        Add Expense
+      </button>
+    </div>
+  </div>
+  <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-2">
+    <p-table
+      [value]="expenses"
+      stripedRows
+      [paginator]="true"
+      [scrollable]="true"
+      [rows]="10"
+      [tableStyle]="{ 'min-width': '50rem' }"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      [showCurrentPageReport]="true"
+    >
+      <ng-template #header>
+        <tr>
+          <th>#</th>
+          <th>Expense Name</th>
+          <th>Merchant Name</th>
+          <th>Date</th>
+          <th>Amount</th>
+          <th>Paid</th>
+          <th>Due</th>
+          <th>Paid From</th>
+          <th>Action</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-expense let-i="rowIndex">
+        <tr
+          class="text-sm"
+          [ngClass]="expense.amount - expense.paid > 0 ? '!bg-red-100' : ''"
+        >
+          <td>{{ i + 1 }}</td>
+          <td>{{ expense.name }}</td>
+          <td>{{ expense.merchantName }}</td>
+          <td>
+            {{ expense.expenseDate }}
+          </td>
+          <td>
+            {{ expense.amount }}
+          </td>
+          <td>
+            {{ expense.paid }}
+          </td>
+           
+          <td>
+            {{ expense.amount - expense.paid }}
+          </td><td>
+            {{ expense.paidFrom }}
+          </td>
+          <td class="w-[15%]">
+            <i
+              (click)="onEdit(expense)"
+              class="fa-solid cursor-pointer text-blue-700 fa-pen-to-square text-lg"
+            ></i>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #footer let-customer let-index="rowIndex">
+        <tr class="font-bold">
+          <td colspan="4" class="text-center">Total:</td>
+          <td>&#8377; {{ total }}</td>
+          <td>&#8377; {{ paidTotal }}</td>
+          <td colspan="2">&#8377; {{ total - paidTotal }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+<p-dialog
+  [header]="!isEdit ? 'Add Expense' : 'Edit Expense'"
+  [modal]="true"
+  [(visible)]="visible"
+  [style]="{ width: '100%', maxWidth: '50rem' }"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+>
+  <form [formGroup]="expenseForm" class="space-y-4">
+    <!-- Expense Title & Merchant Name -->
+    <div class="flex flex-col md:flex-row md:gap-4">
+      <div class="flex-1 mb-4 md:mb-0">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Expense Title</label
+        >
+        <input
+          formControlName="name"
+          class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+        />
+      </div>
+      <div class="flex-1">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Merchant Name</label
+        >
+        <input
+          formControlName="merchantName"
+          class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+        />
+      </div>
+    </div>
+
+    <!-- Category, Expense Date & Payment Mode -->
+    <div class="flex flex-col md:flex-row md:gap-4">
+      <div class="flex-1 mb-4 md:mb-0">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Category</label
+        >
+        <p-select
+          [options]="categoryOptions"
+          formControlName="category"
+          optionLabel="name"
+          [filter]="true"
+          [showClear]="true"
+          placeholder="Select a Category"
+          appendTo="body"
+          class="w-full"
+        ></p-select>
+      </div>
+
+      <div class="flex-1 mb-4 md:mb-0">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Expense Date</label
+        >
+        <p-datepicker
+          class="w-full"
+          size="large"
+          formControlName="expenseDate"
+          [showIcon]="true"
+          appendTo="body"
+          dateFormat="dd/mm/yy"
+        ></p-datepicker>
+      </div>
+
+      <div class="flex-1">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Payment Mode</label
+        >
+        <p-select
+          [options]="paymentOptions"
+          formControlName="paymentMode"
+          optionLabel="name"
+          [filter]="true"
+          [showClear]="true"
+          placeholder="Select a Mode"
+          appendTo="body"
+          class="w-full"
+        ></p-select>
+      </div>
+    </div>
+
+    <!-- Amount & Paid -->
+    <div class="flex flex-col md:flex-row md:gap-4">
+      <div class="flex-1 mb-4 md:mb-0">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Expense Amount</label
+        >
+        <input
+          formControlName="amount"
+          class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+        />
+      </div>
+
+      <div class="flex-1">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Paid Amount</label
+        >
+        <input
+          formControlName="paid"
+          class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+        />
+      </div>
+
+      <div class="flex-1">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Paid From</label
+        >
+        <input
+          formControlName="paidFrom"
+          class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+        />
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-col md:flex-row md:justify-end md:gap-2 gap-2">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        (click)="visible = false"
+      ></p-button>
+      <p-button label="Save" (click)="onSave()"></p-button>
+    </div>
+  </form>
+</p-dialog>

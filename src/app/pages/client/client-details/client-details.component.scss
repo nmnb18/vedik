@@ -1,0 +1,62 @@
+:host {
+    ::ng-deep {
+        .p-datatable .p-datatable-tfoot {
+            position: sticky;
+        }
+
+        .p-datatable-table-container {
+            max-height: calc(100vh - 280px);
+        }
+
+
+        .p-datatable-tbody>tr>td {
+            padding: 5px;
+            font-size: 12px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .p-datatable-thead>tr>th {
+            padding: 2px 5px;
+            font-size: 14px;
+        }
+
+        .p-datatable-tfoot>tr>td {
+            padding: 0px;
+        }
+
+        @media screen and (max-width: 959px) {
+            #pn_id_1-table tbody tr td:nth-child(1)::before {
+                content: "#";
+                font-weight: 600;
+            }
+
+            .p-datatable tbody tr td:nth-child(2)::before {
+                content: "Order ID";
+                font-weight: 600;
+            }
+
+            .p-datatable tbody tr td:nth-child(3)::before {
+                content: "Order Date";
+                font-weight: 600;
+            }
+
+
+            .p-datatable tbody tr td:nth-child(4)::before {
+                content: "Bill Amount";
+                font-weight: 600;
+            }
+
+            .p-datatable tbody tr td:nth-child(5)::before {
+                content: "Received";
+                font-weight: 600;
+            }
+
+            .p-datatable tbody tr td:nth-child(6)::before {
+                content: "Balance";
+                font-weight: 600;
+            }
+        }
+    }
+}

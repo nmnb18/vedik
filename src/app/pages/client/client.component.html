@@ -1,0 +1,261 @@
+<div class="relative overflow-x-auto">
+  <div class="sub-header flex justify-between py-2">
+    <div class="text-2xl font-semibold">Clients</div>
+    <div class="action">
+      <button
+        type="button"
+        class="text-white bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+        (click)="showDialog()"
+      >
+        Add Client
+      </button>
+    </div>
+  </div>
+  <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-2">
+    <p-table
+      [value]="clients"
+      stripedRows
+      [paginator]="true"
+      [scrollable]="true"
+      [rows]="10"
+      [tableStyle]="{ 'min-width': '0' }"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      [showCurrentPageReport]="true"
+      responsiveLayout="stack"
+    >
+      <ng-template #header>
+        <tr>
+          <th>#</th>
+          <th>Dr Name</th>
+          <th>Clinic Name</th>
+          <th>Contact</th>
+          <th>Discount/Scheme</th>
+          <th>Tax</th>
+          <th>Address</th>
+          <th>Action</th>
+        </tr>
+        <tr class="filter-row">
+          <th></th>
+          <th>
+            <p-columnFilter
+              type="text"
+              field="docName"
+              placeholder="Type to search"
+              ariaLabel="Filter"
+              filterOn="input"
+              matchMode="contains"
+            ></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter
+              type="text"
+              field="clinicName"
+              placeholder="Type to search"
+              ariaLabel="Filter "
+              matchMode="contains"
+            ></p-columnFilter>
+          </th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-client let-i="rowIndex">
+        <tr class="text-sm">
+          <td class="w-[5%]">{{ i + 1 }}</td>
+          <td class="w-[15%]">{{ client.docName }}</td>
+          <td class="w-[15%]">{{ client.clinicName }}</td>
+          <td class="w-[15%]">
+            <span>
+              <i class="fa-solid fa-phone mr-1"></i> {{ client.phoneNo }}
+            </span>
+          </td>
+          <td class="w-[15%]">
+            @if(client.discount.name) {
+            <span>{{ client.discount.name }}</span>
+            } @else {
+            <span>{{ client.discount }}%</span>
+            }
+          </td>
+          <td class="w-[15%]">
+            @if(client.tax) {
+            <span>{{ client.tax.name }}</span>
+            }
+          </td>
+          <td class="w-[15%]">
+            <span class="block overflow-hidden text-ellipsis w-[200px]">
+              {{ client.address }}, {{ client.city }}, {{ client.state }} -
+              {{ client.postCode }}
+            </span>
+          </td>
+          <td class="flex gap-4">
+            <i
+              (click)="goToDetails(client.id)"
+              class="fa-solid cursor-pointer fa-eye text-lg text-green-700"
+            ></i>
+            <i
+              (click)="onEdit(client)"
+              class="fa-solid cursor-pointer text-blue-700 fa-pen-to-square text-lg"
+            ></i>
+            <i
+              (click)="deleteClient(client.id)"
+              class="fa-solid cursor-pointer text-red-500 fa-trash text-lg"
+            ></i>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+<p-dialog
+  header="Add Client"
+  [modal]="true"
+  [(visible)]="visible"
+  [style]="{ width: '100%', maxWidth: '50rem' }"
+>
+  <form [formGroup]="clientForm" class="space-y-4">
+    <!-- Doctor Name & Clinic Name -->
+    <div class="flex flex-col md:flex-row md:gap-4">
+      <div class="flex-1 mb-4 md:mb-0">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Doctor Name</label
+        >
+        <input
+          formControlName="docName"
+          class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+          autocomplete="off"
+        />
+      </div>
+      <div class="flex-1">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Clinic/Medical Name</label
+        >
+        <input
+          formControlName="clinicName"
+          class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+          autocomplete="off"
+        />
+      </div>
+    </div>
+
+    <!-- Email & Phone -->
+    <div class="flex flex-col md:flex-row md:gap-4">
+      <div class="flex-1 mb-4 md:mb-0">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Email</label
+        >
+        <input
+          formControlName="email"
+          class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+          autocomplete="off"
+        />
+      </div>
+      <div class="flex-1">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Phone</label
+        >
+        <input
+          formControlName="phoneNo"
+          class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+          maxlength="10"
+          autocomplete="off"
+        />
+      </div>
+    </div>
+
+    <!-- Address & GST No -->
+    <div class="flex flex-col md:flex-row md:gap-4">
+      <div class="flex-1 mb-4 md:mb-0">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Address</label
+        >
+        <input
+          formControlName="address"
+          class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+          autocomplete="off"
+        />
+      </div>
+      <div class="flex-1">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >GST No.</label
+        >
+        <input
+          formControlName="gstNo"
+          class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+          autocomplete="off"
+        />
+      </div>
+    </div>
+
+    <!-- City & State -->
+    <div class="flex flex-col md:flex-row md:gap-4">
+      <div class="flex-1 mb-4 md:mb-0">
+        <label class="block mb-2 text-sm font-medium text-gray-900">City</label>
+        <input
+          formControlName="city"
+          class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+          autocomplete="off"
+        />
+      </div>
+      <div class="flex-1">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >State</label
+        >
+        <input
+          formControlName="state"
+          class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+          autocomplete="off"
+        />
+      </div>
+    </div>
+
+    <!-- Postcode, Discount & Tax -->
+    <div class="flex flex-col md:flex-row md:gap-4">
+      <div class="flex-1 mb-4 md:mb-0">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Postcode</label
+        >
+        <input
+          formControlName="postCode"
+          class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+          autocomplete="off"
+        />
+      </div>
+      <div class="flex-1 mb-4 md:mb-0">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Discount (%)</label
+        >
+        <p-select
+          formControlName="discount"
+          [options]="discountOptions"
+          optionLabel="name"
+          placeholder="Select a Discount"
+          appendTo="body"
+          class="w-full"
+        ></p-select>
+      </div>
+      <div class="flex-1">
+        <label class="block mb-2 text-sm font-medium text-gray-900">Tax</label>
+        <p-select
+          formControlName="tax"
+          [options]="taxOptions"
+          optionLabel="name"
+          placeholder="Select a Tax"
+          appendTo="body"
+          class="w-full"
+        ></p-select>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-col md:flex-row md:justify-end md:gap-2 gap-2">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        (click)="visible = false"
+      ></p-button>
+      <p-button label="Save" (click)="onSave()"></p-button>
+    </div>
+  </form>
+</p-dialog>

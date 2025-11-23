@@ -1,0 +1,48 @@
+<div class="relative">
+  <!-- Header -->
+  <div class="sub-header flex justify-between py-2">
+    <div class="text-2xl font-semibold">Dashboard</div>
+  </div>
+
+  <!-- Charts container -->
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+    <!-- Orders -->
+    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+      <div class="flex w-full justify-center font-semibold mb-2">
+        Total Orders - 2025
+      </div>
+      <p-chart
+        type="bar"
+        [data]="orderData"
+        [options]="orderOptions"
+        class="h-[25rem]"
+      />
+    </div>
+
+    <!-- Revenue -->
+    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+      <div class="flex w-full justify-between items-center font-semibold mb-2">
+        <label>Revenue - 2025</label>
+        <div class="">
+          <label for="year" class="mr-2 font-medium">Select Year:</label>
+          <select
+            id="year"
+            [(ngModel)]="selectedYear"
+            (change)="onYearChange()"
+            class="border border-gray-300 rounded-md p-2"
+          >
+            <option *ngFor="let y of availableYears" [value]="y">
+              {{ y }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <p-chart
+        type="bar"
+        [data]="revenueData"
+        [options]="revenueOptions"
+        class="h-[30rem]"
+      />
+    </div>
+  </div>
+</div>

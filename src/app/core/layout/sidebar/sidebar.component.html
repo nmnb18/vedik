@@ -1,0 +1,101 @@
+<!-- Sidebar -->
+<aside
+  [class.w-64]="!collapsed"
+  [class.w-20]="collapsed"
+  class="fixed top-0 left-0 h-screen bg-white text-black transition-all duration-300 border-r border-gray-200 z-40 lg:translate-x-0 transform lg:relative"
+  [class.-translate-x-full]="isMobile && !isOpen"
+  [class.translate-x-0]="isMobile && isOpen"
+  *ngIf="isLoggedIn$ | async"
+>
+  <!-- Nav -->
+  <ul class="cursor-pointer">
+    <li
+      class="p-4 hover:bg-gray-300 flex items-center border-b border-gray-200 gap-3"
+      [class.justify-center]="collapsed"
+      [class.bg-gray-200]="selected === 'dashboard'"
+      (click)="navigate('dashboard')"
+    >
+      <i class="fa-solid fa-house h-4 w-4"></i>
+      <span *ngIf="!collapsed">Dashboard</span>
+    </li>
+    <li
+      class="p-4 hover:bg-gray-300 flex items-center border-b border-gray-200 gap-3"
+      [class.justify-center]="collapsed"
+      [class.bg-gray-200]="selected === 'order'"
+      (click)="navigate('order')"
+    >
+      <i class="fa-solid fa-cash-register h-4 w-4"></i>
+      <span *ngIf="!collapsed">Order</span>
+    </li>
+    <li
+      class="p-4 hover:bg-gray-300 flex items-center border-b border-gray-200 gap-3"
+      [class.justify-center]="collapsed"
+      [class.bg-gray-200]="selected === 'stock'"
+      (click)="navigate('stock')"
+    >
+      <i class="fa-solid fa-warehouse h-4 w-4"></i>
+      <span *ngIf="!collapsed">Stock</span>
+    </li>
+    <li
+      class="p-4 hover:bg-gray-300 flex items-center border-b border-gray-200 gap-3"
+      [class.justify-center]="collapsed"
+      [class.bg-gray-200]="selected === 'client'"
+      (click)="navigate('client')"
+    >
+      <i class="fa-solid fa-users h-4 w-4"></i>
+      <span *ngIf="!collapsed">Clients</span>
+    </li>
+    <li
+      class="p-4 hover:bg-gray-300 flex items-center border-b border-gray-200 gap-3"
+      [class.justify-center]="collapsed"
+      [class.bg-gray-200]="selected === 'product'"
+      (click)="navigate('product')"
+    >
+      <i class="fa-solid fa-prescription-bottle h-4 w-4"></i>
+      <span *ngIf="!collapsed">Products</span>
+    </li>
+    <li
+      class="p-4 hover:bg-gray-300 flex items-center border-b border-gray-200 gap-3"
+      [class.justify-center]="collapsed"
+      [class.bg-gray-200]="selected === 'transport'"
+      (click)="navigate('transport')"
+    >
+      <i class="fa-solid fa-truck-arrow-right h-4 w-4"></i>
+      <span *ngIf="!collapsed">Transport</span>
+    </li>
+    <li
+      class="p-4 hover:bg-gray-300 flex items-center border-b border-gray-200 gap-3"
+      [class.justify-center]="collapsed"
+      [class.bg-gray-200]="selected === 'expense'"
+      (click)="navigate('expense')"
+    >
+      <i class="fa-solid fa-wallet h-4 w-4"></i>
+      <span *ngIf="!collapsed">Expense</span>
+    </li>
+    <li
+      class="p-4 hover:bg-gray-300 flex items-center border-b border-gray-200 gap-3"
+      [class.justify-center]="collapsed"
+      [class.bg-gray-200]="selected === 'payments'"
+      (click)="navigate('payments')"
+    >
+      <i class="fa-solid fa-money-bill-wave h-4 w-4"></i>
+      <span *ngIf="!collapsed">Payments</span>
+    </li>
+    <li
+      class="p-4 hover:bg-gray-300 flex items-center border-b border-gray-200 gap-3"
+      [class.justify-center]="collapsed"
+      [class.bg-gray-200]="selected === 'cp-orders'"
+      (click)="navigate('cp-orders')"
+    >
+      <i class="fa-solid fa-cash-register h-4 w-4"></i>
+      <span *ngIf="!collapsed">CP orders</span>
+    </li>
+  </ul>
+</aside>
+
+<!-- Backdrop for Mobile -->
+<div
+  *ngIf="isMobile && isOpen"
+  class="fixed inset-0 bg-black opacity-50 z-30"
+  (click)="closeSidebar()"
+></div>

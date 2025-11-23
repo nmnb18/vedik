@@ -1,0 +1,26 @@
+:host {
+  ::ng-deep {
+    .p-datatable .p-datatable-tfoot {
+      position: sticky;
+    }
+
+    .p-datatable-table-container {
+      max-height: calc(100vh - 280px);
+    }
+
+
+    .p-datatable-tbody>tr>td {
+      padding: 5px;
+      font-size: 12px;
+    }
+
+    .p-datatable-thead>tr>th {
+      padding: 2px 5px;
+      font-size: 14px;
+    }
+
+    .p-datatable-tfoot>tr>td {
+      padding: 0px;
+    }
+  }
+}

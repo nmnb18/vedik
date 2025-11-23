@@ -1,0 +1,19 @@
+<nav class="text-white p-4 flex">
+  <button
+    *ngIf="isLoggedIn$ | async"
+    class="lg:hidden p-2 rounded-md text-gray-700 cursor-pointer"
+    (click)="toggleSidebar.emit()"
+  >
+    <i class="fa-solid fa-bars text-xl"></i>
+  </button>
+  <div class="py-1 flex flex-1 justify-center">
+    <img src="/images/logo-dark.png" class="h-auto w-30" alt="Logo" />
+  </div>
+  <button
+    *ngIf="isLoggedIn$ | async"
+    class="p-2 rounded-md text-gray-700 cursor-pointer"
+    (click)="logout()"
+  >
+    Logout
+  </button>
+</nav>

@@ -1,0 +1,319 @@
+<div class="relative overflow-x-auto">
+  <div class="sub-header flex justify-between py-2">
+    <div class="text-2xl font-semibold">Orders</div>
+    <div class="action flex gap-2">
+      <button
+        type="button"
+        class="text-white bg-green-700 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 cursor-pointer"
+        (click)="openDownloadModal()"
+      >
+        Download
+      </button>
+      <button
+        type="button"
+        class="text-white bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 cursor-pointer"
+        (click)="addOrder()"
+      >
+        Add Order
+      </button>
+    </div>
+  </div>
+  <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-2">
+    <p-table
+      #dt2
+      [value]="orders"
+      dataKey="id"
+      stripedRows
+      [paginator]="true"
+      [scrollable]="true"
+      [rows]="10"
+      [tableStyle]="{ 'min-width': '0' }"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      [showCurrentPageReport]="true"
+      [globalFilterFields]="['client.docName', 'client.clinicName']"
+      sortMode="multiple"
+      responsiveLayout="stack"
+    >
+      <ng-template #caption>
+        <div class="flex">
+          <p-iconfield iconPosition="left" class="ml-auto">
+            <p-inputicon>
+              <i class="pi pi-search"></i>
+            </p-inputicon>
+            <input
+              pInputText
+              type="text"
+              (input)="onGlobalFilter($event)"
+              class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              placeholder="Search keyword"
+            />
+          </p-iconfield>
+        </div>
+      </ng-template>
+      <ng-template #header pTemplate="header">
+        <tr>
+          <th class="w-[5%]">#</th>
+          <th pSortableColumn="orderId" class="w-[15%]">
+            Order ID
+            <p-sortIcon field="orderId"></p-sortIcon>
+          </th>
+          <th pSortableColumn="orderDate" class="w-[15%]">
+            Order Date
+            <p-sortIcon field="orderDate"></p-sortIcon>
+          </th>
+          <th class="w-[20%]">Client Name</th>
+          <th class="w-[20%]">Amount</th>
+          <th class="w-[10%]">Received</th>
+          <th class="w-[15%]">Action</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-order let-i="rowIndex" pTemplate="body">
+        <tr
+          class="text-sm"
+          [ngClass]="order.markAsVoid ? 'opacity-50 !bg-red-100' : ''"
+        >
+          <td class="w-[5%]" pTableResponsiveLabel="#">{{ i + 1 }}</td>
+          <td class="w-[15%]" pTableResponsiveLabel="Order ID">
+            {{ order.orderId }}
+          </td>
+          <td class="w-[15%]" pTableResponsiveLabel="Order Date">
+            {{ order.orderDate }}
+          </td>
+          <td class="w-[10%]" pTableResponsiveLabel="Client Name">
+            {{ order.client.docName || order.client.clinicName }}
+          </td>
+          <td class="w-[20%]" pTableResponsiveLabel="Bill Amount">
+            {{ order.grandTotal | currency : "INR" }}
+          </td>
+          <td class="w-[10%]" pTableResponsiveLabel="Received">
+            {{ order.paidAmount | currency : "INR" }}
+          </td>
+          <td class="flex gap-4">
+            <i
+              (click)="previewInvoice(order)"
+              class="fa-solid cursor-pointer fa-eye text-orange-400 mr-2 text-lg"
+            ></i>
+
+            <i
+              (click)="generateInvoice(order)"
+              class="fa-solid cursor-pointer fa-receipt text-green-700 mr-2 text-lg"
+            ></i>
+
+            <i
+              (click)="onEdit(order)"
+              class="fa-solid cursor-pointer text-blue-700 ml-2 fa-pen-to-square text-lg"
+            ></i>
+            <i
+              (click)="confirmDelete(order)"
+              class="fa-solid cursor-pointer text-red-700 ml-2 fa-trash text-lg"
+            ></i>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template #footer let-customer let-index="rowIndex">
+        <tr class="font-bold">
+          <td colspan="4" class="text-center">Total:</td>
+          <td>&#8377; {{ getFilteredTotal() }}</td>
+          <td colspan="2">&#8377; {{ getRecievedTotal() }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+<p-dialog
+  header="Add Order"
+  [modal]="true"
+  [(visible)]="visible"
+  [style]="{ width: '100%', maxWidth: '75rem' }"
+>
+  <form [formGroup]="orderForm" class="space-y-4">
+    <!-- Client & Transport -->
+    <div class="flex flex-col md:flex-row md:gap-4">
+      <div class="flex-1 mb-4 md:mb-0">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Client Name</label
+        >
+        <p-select
+          [options]="clientOptions"
+          formControlName="clientName"
+          optionLabel="name"
+          [filter]="true"
+          filterBy="name"
+          [showClear]="true"
+          placeholder="Select a Client"
+          appendTo="body"
+          class="w-full"
+        ></p-select>
+      </div>
+
+      <div class="flex-1">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Transport</label
+        >
+        <p-select
+          [options]="transportOptions"
+          formControlName="transport"
+          optionLabel="name"
+          [filter]="true"
+          filterBy="name"
+          [showClear]="true"
+          placeholder="Select a Transport"
+          appendTo="body"
+          class="w-full"
+        ></p-select>
+      </div>
+    </div>
+
+    <!-- Order Items -->
+    <ng-container formArrayName="items">
+      <div
+        *ngFor="let input of items.controls; let i = index"
+        [formGroupName]="i"
+        class="space-y-4 md:space-y-0 md:flex md:gap-4"
+      >
+        <div class="flex-1">
+          <label class="block mb-2 text-sm font-medium text-gray-900"
+            >Item Name</label
+          >
+          <p-select
+            [options]="productOptions"
+            formControlName="productName"
+            optionLabel="name"
+            [filter]="true"
+            [showClear]="true"
+            placeholder="Select Item"
+            appendTo="body"
+            class="w-full"
+          ></p-select>
+        </div>
+
+        <div class="flex-1">
+          <label class="block mb-2 text-sm font-medium text-gray-900"
+            >Batch No</label
+          >
+          <input
+            pInputText
+            formControlName="batchNo"
+            class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+          />
+        </div>
+
+        <div class="flex-1">
+          <label class="block mb-2 text-sm font-medium text-gray-900"
+            >Size</label
+          >
+          <input
+            pInputText
+            formControlName="size"
+            class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+          />
+        </div>
+
+        <div class="flex-1">
+          <label class="block mb-2 text-sm font-medium text-gray-900"
+            >Quantity</label
+          >
+          <input
+            pInputNumber
+            formControlName="quantity"
+            class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+          />
+        </div>
+
+        <div class="flex-1">
+          <label class="block mb-2 text-sm font-medium text-gray-900"
+            >Price</label
+          >
+          <input
+            pInputText
+            formControlName="price"
+            class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+          />
+        </div>
+      </div>
+      <div class="flex justify-end">
+        <p-button label="Add Item" (click)="addInput(null)" />
+      </div>
+    </ng-container>
+
+    <!-- Totals and Actions -->
+    <div
+      class="flex flex-col md:flex-row md:justify-between md:items-end gap-4"
+    >
+      <div class="flex-1">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Total Box</label
+        >
+        <input
+          pInputText
+          formControlName="totalBox"
+          class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+        />
+      </div>
+
+      <div class="flex gap-2 flex-wrap">
+        <p-button
+          label="Cancel"
+          severity="secondary"
+          (click)="visible = false"
+        ></p-button>
+        <p-button label="Save" (click)="onSave()"></p-button>
+      </div>
+    </div>
+  </form>
+</p-dialog>
+<p-dialog
+  header="Download"
+  [modal]="true"
+  [(visible)]="isDownloadModal"
+  [style]="{ width: '100%', maxWidth: '75rem' }"
+>
+  <div class="flex flex-col md:flex-row md:gap-4 md:items-end">
+    <div class="flex-1 mb-4 md:mb-0">
+      <label class="block mb-2 text-sm font-medium text-gray-900">Month</label>
+      <p-select
+        [options]="monthOptions"
+        [(ngModel)]="downloadMonth"
+        optionLabel="name"
+        [filter]="true"
+        filterBy="name"
+        [showClear]="true"
+        placeholder="Select a Month"
+        appendTo="body"
+        class="w-full"
+      ></p-select>
+    </div>
+
+    <div class="flex-1 mb-4 md:mb-0">
+      <label class="block mb-2 text-sm font-medium text-gray-900">Year</label>
+      <p-select
+        [options]="yearOptions"
+        [(ngModel)]="downloadYear"
+        optionLabel="name"
+        [filter]="true"
+        filterBy="name"
+        [showClear]="true"
+        placeholder="Select a Year"
+        appendTo="body"
+        class="w-full"
+      ></p-select>
+    </div>
+    <div class="flex flex-1 gap-4 flex-col md:flex-row">
+      <button
+        type="button"
+        class="text-white bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 cursor-pointer"
+        (click)="downloadSelected()"
+      >
+        Download Selected
+      </button>
+      <button
+        type="button"
+        class="text-white bg-green-700 font-medium rounded-lg text-sm px-5 py-2.5 cursor-pointer"
+        (click)="downloadExcel()"
+      >
+        Download All
+      </button>
+    </div>
+  </div>
+</p-dialog>

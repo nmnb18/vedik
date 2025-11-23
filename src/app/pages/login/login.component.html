@@ -1,0 +1,33 @@
+<div class="flex items-center justify-center h-screen bg-gray-100">
+  <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+    <h2 class="text-2xl font-semibold mb-4">Login</h2>
+    <form
+      [formGroup]="loginForm"
+      (ngSubmit)="login()"
+      class="flex flex-col gap-4"
+    >
+      <input
+        formControlName="email"
+        type="email"
+        placeholder="Email"
+        name="email"
+        id="email"
+        class="border p-2 w-full rounded"
+        required
+      />
+      <input
+        formControlName="password"
+        type="password"
+        placeholder="Password"
+        name="password"
+        id="password"
+        class="border p-2 w-full rounded"
+        required
+      />
+      <div *ngIf="errorMessage" class="text-red-500">{{ errorMessage }}</div>
+      <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded">
+        Login
+      </button>
+    </form>
+  </div>
+</div>

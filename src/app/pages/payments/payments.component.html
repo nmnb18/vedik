@@ -1,0 +1,175 @@
+<div class="relative overflow-x-auto">
+  <div class="sub-header flex justify-between py-2">
+    <div class="text-2xl font-semibold">Payments</div>
+    <!-- <div class="action">
+      <button
+        type="button"
+        class="text-white bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+        (click)="showDialog()"
+      >
+        Add Payment
+      </button>
+    </div> -->
+  </div>
+  <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-2">
+    <p-table
+      [value]="payments"
+      stripedRows
+      [paginator]="true"
+      [scrollable]="true"
+      [rows]="10"
+      [tableStyle]="{ 'min-width': '50rem' }"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      [showCurrentPageReport]="true"
+    >
+      <ng-template #header>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Payment Date</th>
+          <th>Total Amount</th>
+          <th>Total Paid</th>
+          <th>Due</th>
+          <th>Payment Mode</th>
+          <th>Action</th>
+        </tr>
+        <tr class="filter-row">
+          <th></th>
+          <th>
+            <p-columnFilter
+              type="text"
+              field="name"
+              placeholder="Type to search"
+              ariaLabel="Filter"
+              filterOn="input"
+              matchMode="contains"
+            ></p-columnFilter>
+          </th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th><th></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-payment let-i="rowIndex">
+        <tr
+          class="text-sm"
+        >
+          <td>{{ i + 1 }}</td>
+          <td>{{ payment.name }}</td>
+          <td>
+            {{ payment.paymentDate }}
+          </td>
+          <td>
+            {{ payment.totalPayment }}
+          </td>
+          <td>
+            {{ payment.receivedPayment }}
+          </td>
+           
+          <td>
+            {{ payment.totalPayment - payment.receivedPayment }}
+          </td><td>
+            {{ payment.paymentMode?.name }}
+          </td>
+          <td class="w-[15%]">
+            <i
+              (click)="onEdit(payment)"
+              class="fa-solid cursor-pointer text-blue-700 fa-pen-to-square text-lg"
+            ></i>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #footer let-customer let-index="rowIndex">
+        <tr class="font-bold">
+          <td colspan="3" class="text-center">Total:</td>
+          <td>&#8377; {{ total }}</td>
+          <td>&#8377; {{ paidTotal }}</td>
+          <td colspan="3">&#8377; {{ total - paidTotal }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+<p-dialog
+  [header]="!isEdit ? 'Add Payment' : 'Edit Payment'"
+  [modal]="true"
+  [(visible)]="visible"
+  [style]="{ width: '100%', maxWidth: '50rem' }"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+>
+  <form [formGroup]="paymentsForm" class="space-y-4">
+    <!-- Expense Title & Merchant Name -->
+    <div class="flex flex-col md:flex-row md:gap-4">
+      <div class="flex-1 mb-4 md:mb-0">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Client Name</label
+        >
+        <input
+          formControlName="name"
+          class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+        />
+      </div>
+      <div class="flex-1">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Payment Date</label
+        >
+        <p-datepicker
+          class="w-full"
+          size="large"
+          formControlName="paymentDate"
+          [showIcon]="true"
+          appendTo="body"
+          dateFormat="dd/mm/yy"
+        ></p-datepicker>
+      </div>
+    </div>
+
+    <!-- Category, Expense Date & Payment Mode -->
+    <div class="flex flex-col md:flex-row md:gap-4">
+        <div class="flex-1 mb-4 md:mb-0">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Received Amount</label
+        >
+        <input
+          formControlName="receivedPayment"
+          class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+        />
+      </div>
+
+      <div class="flex-1">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Payment Received</label
+        >
+        <p-select
+          [options]="paymentOptions"
+          formControlName="paymentMode"
+          optionLabel="name"
+          placeholder="Select a Mode"
+          appendTo="body"
+          class="w-full"
+        ></p-select>
+      </div>
+      <div class="flex-1 mb-4 md:mb-0">
+        <label class="block mb-2 text-sm font-medium text-gray-900"
+          >Total Amount</label
+        >
+        <input
+          formControlName="totalPayment"
+          class="border border-gray-300 rounded-lg w-full p-2.5 text-sm"
+        />
+      </div>
+</div>
+
+    <!-- Actions -->
+    <div class="flex flex-col md:flex-row md:justify-end md:gap-2 gap-2">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        (click)="visible = false"
+      ></p-button>
+      <p-button label="Save" (click)="onSave()"></p-button>
+    </div>
+  </form>
+</p-dialog>
